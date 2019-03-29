@@ -7,24 +7,46 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity()
  */
-class Medico
+class Medico implements \JsonSerializable
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    public $id;
+    private $id;
+
+    public function getId(): ?int{
+        return $this->id;
+    }
 
     /**
      * @ORM\Column(type="integer")
      */
-    public $crm;
+    private $crm;
+
+    public function getCrm():?int{
+        return $this->crm;
+    }
+
+    public function setCrm(int $crm): self{
+        $this->crm = $crm;
+        return $this;
+    }
 
     /**
      * @ORM\Column(type="string")
      */
-    public $nome;
+    private $nome;
+
+    public function getNome():?string{
+        return $this->nome;
+    }
+
+    public function setNome(string $nome):self{
+        $this->nome = $nome;
+        return $this;
+    }
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Especialidade")
@@ -42,5 +64,14 @@ class Medico
         $this->especialidade = $especialidade;
 
         return $this;
+    }
+
+    public function jsonserialize(){
+        return [
+            "id" => $this->id,
+            "nome" => $this->nome,
+            "crm" => $this->crm,
+            "especialidadeId" => $this->especialidade->getId()
+        ];
     }
 }

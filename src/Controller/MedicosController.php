@@ -15,6 +15,7 @@ class MedicosController extends AbstractController{
 
     private $entityManager;
     private $medicoFactory;
+    private $especialidadesRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -70,8 +71,9 @@ class MedicosController extends AbstractController{
             return new Response('', Response::HTTP_NOT_FOUND);
         }
 
-        $medicoBuscado->crm = $medicoRecebido->crm;
-        $medicoBuscado->nome = $medicoRecebido->nome;
+        $medicoBuscado->setCrm($medicoRecebido->getCrm());
+        $medicoBuscado->setNome($medicoRecebido->getNome());
+        $medicoBuscado->setEspecialidade($medicoRecebido->getEspecialidade());
 
         $this->entityManager->flush();
 
