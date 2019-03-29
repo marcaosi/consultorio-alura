@@ -9,16 +9,19 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\Medico;
+use App\Utils\MedicoFactory;
 
 class MedicosController extends AbstractController{
 
-    /**
-     * @var EntityManagerInterface
-     */
     private $entityManager;
+    private $medicoFactory;
 
-    public function __construct(EntityManagerInterface $entityManager){
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        MedicoFactory $medicoFactory
+    ){
         $this->entityManager = $entityManager;
+        $this->medicoFactory = $medicoFactory;
     }
 
     /**
@@ -26,11 +29,7 @@ class MedicosController extends AbstractController{
      */
     public function novo(Request $request) : Response{
         $corpoRequisicao = $request->getContent();
-        $dados = json_decode($corpoRequisicao);
-
-        $medico = new Medico();
-        $medico->crm = $dados->crm;
-        $medico->nome = $dados->nome;
+        $medico = $this->medicoFactory->criarMedico($corpoRequisicao);
 
         $this->entityManager->persist($medico);
         $this->entityManager->flush();
@@ -52,13 +51,49 @@ class MedicosController extends AbstractController{
     /**
      * @Route("/medicos/{id}", methods={"GET"})
      */
-    public function find(Request $request) : Response{
-        $repositorioDeMedicos = $this->getDoctrine()->getRepository(Medico::class);
-
-        $id = $request->get("id");
-        $medico = $repositorioDeMedicos->find($id);
+    public function find(int $id) : Response{
+        $medico = $this->buscaMedico($id);
         $codigoResposta = is_null($medico) ? Response::HTTP_NO_CONTENT : 200;
 
         return new JsonResponse($medico, $codigoResposta);
+    }
+
+    /**
+     * @Route("/medicos/{id}", methods={"PUT"})
+     */
+    public function atualiza(int $id, Request $request): Response{
+        $corpoRequisicao = $request->getContent();
+        $medicoRecebido = $this->medicoFactory->criarMedico($corpoRequisicao);
+        $medicoBuscado = $this->buscaMedico($id);
+
+        if(is_null($medicoBuscado)){
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
+
+        $medicoBuscado->crm = $medicoRecebido->crm;
+        $medicoBuscado->nome = $medicoRecebido->nome;
+
+        $this->entityManager->flush();
+
+        return new JsonResponse($medicoBuscado);
+    }
+
+    /**
+     * @Route("/medicos/{id}", methods={"DELETE"})
+     */
+    public function remove(int $id): Response{
+        $medico = $this->buscaMedico($id);
+
+        $this->entityManager->remove($medico);
+        $this->entityManager->flush();
+
+        return new Response('', Response::HTTP_NO_CONTENT);
+    }
+
+    public function buscaMedico($id){
+        $repositorioDeMedicos = $this->getDoctrine()->getRepository(Medico::class);
+        $medico = $repositorioDeMedicos->find($id);
+
+        return $medico;
     }
 }
