@@ -12,15 +12,17 @@ use App\Entity\Medico;
 use App\Utils\MedicoFactory;
 use App\Repository\MedicosRepository;
 use App\Controller\BaseController;
+use App\Utils\ExtratorDadosRequest;
 
 class MedicosController extends BaseController{
 
     public function __construct(
         EntityManagerInterface $entityManager,
         MedicoFactory $medicoFactory,
-        MedicosRepository $medicosRepository
+        MedicosRepository $medicosRepository,
+        ExtratorDadosRequest $extrator
     ){
-        parent::__construct($medicosRepository, $entityManager, $medicoFactory);
+        parent::__construct($medicosRepository, $entityManager, $medicoFactory, $extrator);
     }
 
     

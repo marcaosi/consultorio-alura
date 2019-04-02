@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\EspecialidadeRepository;
 use App\Utils\EspecialidadeFactory;
+use App\Utils\ExtratorDadosRequest;
 
 class EspecialidadesController extends BaseController
 {
@@ -18,10 +19,11 @@ class EspecialidadesController extends BaseController
     public function  __construct(
         EspecialidadeRepository $repository, 
         EntityManagerInterface $entityManager,
-        EspecialidadeFactory $especialidadeFactory
+        EspecialidadeFactory $especialidadeFactory,
+        ExtratorDadosRequest $extrator
     ){
         
-        parent::__construct($repository, $entityManager, $especialidadeFactory);
+        parent::__construct($repository, $entityManager, $especialidadeFactory, $extrator);
     }
 
    public function atualizaEntidadeExistente($id, $entidadeEnviada){
