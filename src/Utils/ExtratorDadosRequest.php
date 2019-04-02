@@ -6,11 +6,24 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ExtratorDadosRequest{
     private function buscaDadosRequest(Request $request){
-        $sort = $request->get('sort');
-        $filter = $request->query->all();
-        unset($filter['sort']);
+        $queryString = $request->query->all();
+        
+        $sort = array_key_exists('sort', $queryString)
+                ? $queryString['sort']
+                : null;
+        unset($queryString['sort']);
 
-        return [$sort, $filter];
+        $page = array_key_exists('page', $queryString)
+                ? $queryString['page']
+                : 1;
+        unset($queryString['page']);
+
+        $itensPorPagina = array_key_exists('itensPorPagina', $queryString)
+                ? $queryString['itensPorPagina']
+                : 5;
+        unset($queryString['itensPorPagina']);
+
+        return [$sort, $queryString, $page, $itensPorPagina];
     }
 
     public function buscaDadosOrdenacao(Request $request){
@@ -23,5 +36,10 @@ class ExtratorDadosRequest{
         [, $filter] = $this->buscaDadosRequest($request);
 
         return $filter;
+    }
+
+    public function buscaDadosPaginacao(Request $request){
+        [, , $page, $itensPorPagina] = $this->buscaDadosRequest($request);
+        return [$page, $itensPorPagina];
     }
 }
