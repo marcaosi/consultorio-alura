@@ -44,7 +44,7 @@ class LoginController extends AbstractController
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $token = JWT::encode(['usernmae' => $user->getUsername()], 'chave');
+        $token = JWT::encode(['username' => $user->getUsername()], 'chave');
 
         return new JsonResponse([
             'access_token' => $token
