@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Utils\EntidadeFactory;
+use App\Utils\ResponseFactory;
 use App\Utils\ExtratorDadosRequest;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,8 +52,10 @@ abstract class BaseController extends AbstractController{
             $itensPorPagina,
             ($page - 1) * $itensPorPagina
         );
+
+        $responseFactory = new ResponseFactory(true, $list, Response::HTTP_OK, $page, $itensPorPagina);
         
-        return new JsonResponse($list);
+        return $responseFactory->getResponse();
     }
 
     public function buscarUm($id){
